@@ -4,3 +4,12 @@ __pycache__/
 .venv/
 .env
 *.pyc
+/sample/
+
+# For Frontend/
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
+Frontend/.env
+Frontend/*.log
+
