@@ -5,3 +5,7 @@ pydantic-settings>=2.6.0
 semver>=3.0.2
 PyJWT>=2.9.0
 python-multipart>=0.0.12
+aiomqtt>=2.3.0
+passlib[bcrypt]>=1.7.4
+google-auth>=2.29.0
+requests>=2.34.2

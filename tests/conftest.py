@@ -4,7 +4,6 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 os.environ.setdefault("MONGO_URI", "mongodb://localhost:27017")
-os.environ.setdefault("ADMIN_API_KEY", "test-key")
 os.environ.setdefault("SIGNED_URL_SECRET", "test-signing-secret")
 os.environ.setdefault("PUBLIC_BASE_URL", "http://testserver")
 

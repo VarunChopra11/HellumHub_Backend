@@ -13,3 +13,4 @@ Frontend/build/
 Frontend/.env
 Frontend/*.log
 
+mosquitto/passwd

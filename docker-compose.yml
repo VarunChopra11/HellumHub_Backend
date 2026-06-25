@@ -1,0 +1,41 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: hellum_mosquitto
+    restart: unless-stopped
+    ports:
+      - "8883:8883"   # MQTTS — external (ESP32 devices)
+      - "1883:1883"   # MQTT  — internal only (FastAPI app)
+      - "8083:8083"   # WebSockets — external (React frontend)
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/passwd:/mosquitto/config/passwd:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    networks:
+      - iot_net
+
+  api:
+    build: .
+    container_name: hellum_api
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mosquitto
+    environment:
+      # Override MQTT host to use docker service name when running in compose
+      MQTT_BROKER_HOST: mosquitto
+      MQTT_BROKER_PORT: 1883
+    networks:
+      - iot_net
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
+
+networks:
+  iot_net:
+    driver: bridge
