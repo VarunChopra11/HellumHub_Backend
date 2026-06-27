@@ -12,7 +12,9 @@ Handles the three core intents Google Home sends:
             No MQTT round-trip needed — state is kept live in the DB by the
             MQTT bridge.
 
-  EXECUTE — Send an ON/OFF command via MQTT and optimistically update MongoDB.
+  EXECUTE — Send an ON/OFF command via MQTT. MongoDB is updated strictly when
+            the ESP32 publishes its confirmed state back (handled by the MQTT
+            bridge). No optimistic writes are performed here.
 
 Device ID format: "<12-char-mac>_<endpoint_id>"   e.g. "aabbccddeeff_light1"
 
@@ -163,7 +165,7 @@ async def _handle_query(
 
 
 # ---------------------------------------------------------------------------
-# EXECUTE — send command via MQTT and update MongoDB
+# EXECUTE — send command via MQTT; DB updated on ESP32 confirmation only
 # ---------------------------------------------------------------------------
 
 async def _handle_execute(
@@ -218,7 +220,11 @@ async def _handle_execute(
                     continue
 
                 await mqtt_service.publish_command(mac, endpoint_id, target_on)
-                await device_repo.update_endpoint_state(mac, endpoint_id, target_on)
+                # NOTE: No optimistic DB update here.  MongoDB is updated
+                # strictly when the ESP32 publishes its confirmed state back
+                # via MQTT (handled in mqtt_service.py).  Writing the assumed
+                # state here would leave the DB out of sync if the device is
+                # offline or drops the message.
 
                 success_ids.append(device_id)
                 logger.info(
